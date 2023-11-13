@@ -1,9 +1,12 @@
 class Api::PetsController < ApplicationController
+  include Authenticable
+
+  before_action :authenticate_with_token, except: %i[index show]
   before_action :set_pet, only: %i[show update destroy]
 
   # GET /pets
   def index
-    @pets = Pet.all.sorted_by_name
+    @pets = Pet.search(params[:term]).sorted_by_name
 
     render json: @pets
   end
