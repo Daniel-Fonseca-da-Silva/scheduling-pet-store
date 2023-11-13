@@ -3,7 +3,7 @@ class Api::PetsController < ApplicationController
 
   # GET /pets
   def index
-    @pets = Pet.all.sorted_by_name
+    @pets = Pet.search(params[:term]).sorted_by_name
 
     render json: @pets
   end
