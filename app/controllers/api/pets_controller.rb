@@ -1,9 +1,9 @@
-class PetsController < ApplicationController
-  before_action :set_pet, only: %i[ show update destroy ]
+class Api::PetsController < ApplicationController
+  before_action :set_pet, only: %i[show update destroy]
 
   # GET /pets
   def index
-    @pets = Pet.all
+    @pets = Pet.all.sorted_by_name
 
     render json: @pets
   end
@@ -18,7 +18,7 @@ class PetsController < ApplicationController
     @pet = Pet.new(pet_params)
 
     if @pet.save
-      render json: @pet, status: :created, location: @pet
+      render json: @pet, status: :created, location: api_pet_url(@pet)
     else
       render json: @pet.errors, status: :unprocessable_entity
     end
@@ -39,6 +39,7 @@ class PetsController < ApplicationController
   end
 
   private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_pet
       @pet = Pet.find(params[:id])
