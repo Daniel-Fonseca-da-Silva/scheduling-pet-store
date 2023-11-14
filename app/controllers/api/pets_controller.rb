@@ -1,12 +1,12 @@
 class Api::PetsController < ApplicationController
   include Authenticable
 
-  before_action :authenticate_with_token, except: %i[index show]
+  before_action :authenticate_with_token
   before_action :set_pet, only: %i[show update destroy]
 
   # GET /pets
   def index
-    @pets = Pet.search(params[:term]).sorted_by_name
+    @pets = Pet.by_token(@token).search(params[:term]).sorted_by_name
 
     render json: @pets
   end
@@ -18,7 +18,7 @@ class Api::PetsController < ApplicationController
 
   # POST /pets
   def create
-    @pet = Pet.new(pet_params)
+    @pet = Pet.new(pet_params.to_h.merge!({ token: @token }))
 
     if @pet.save
       render json: @pet, status: :created, location: api_pet_url(@pet)
@@ -45,7 +45,7 @@ class Api::PetsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_pet
-      @pet = Pet.find(params[:id])
+      @pet = Pet.by_token(@token).find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
